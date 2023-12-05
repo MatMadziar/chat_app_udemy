@@ -1,6 +1,11 @@
+import 'package:chat_app/widgets/user_image_picker.dart';
+// I need this in order to use Firebase Storage package
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 // I need to import packade for firebase for authentication
 import 'package:firebase_auth/firebase_auth.dart';
+// gia na kanw xrhsh to File
+import 'dart:io';
 
 // After adding a auth. package I need to make a GLOBAL (gia auto einai edw panw) final variable
 // I put it here because I can use it over and over again in my entire code
@@ -28,6 +33,8 @@ class _AuthScreenState extends State<AuthScreen> {
   // I will add 2 empty string values
   var _enteredEmail = '';
   var _enteredPassword = '';
+  // Add Photo, file not null
+  File? _selectedImage;
   //
   //
   // I want to make sure that the values are safe and I get hold the entered values
@@ -43,9 +50,26 @@ class _AuthScreenState extends State<AuthScreen> {
 // to kanw etsi gia aplotota
 // to avoid adding too many levels of nested "if" statements
 // ean h eisodos den einai Valid tote paketo. allios kanw seve thn eisodo parakatw
+// if not valid - or (not in login mode -ara new user signin mode) kai epilegmenh eikona einai keno tote paketo h sindesh
+    if (!isValid || (!_isLogin && _selectedImage == null)) {
+      // I can show en error message if I want
+      return;
+    }
+
+//-----------  ta kanw 1 if CHECK START //
+    /* 
     if (!isValid) {
       return;
     }
+
+// I want to check the existence of the image only in SignIN (Create account), not every time when logging
+// ean den einai sto login mode (are o xrhsths kanei Sign IN kai h epilegmenh eikona einai keno) paketo
+    if (!_isLogin && _selectedImage == null) {
+      return;
+    }
+    */
+//-----  ta kanw 1 if CHECK END ---------//
+
     //if my input is valid, I will save the current state
     _formKey.currentState!.save();
     // tsekarw an o user einai Login. edw px borw na ritmisw an o user einai login na mhn tou zitaw ta stoixeia tou ksana.
@@ -76,6 +100,26 @@ class _AuthScreenState extends State<AuthScreen> {
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
         // print(userCredentials); // emfanizw ta user credential sto debug console
+        //
+        // I want to uppload photo. First create account then add extra info
+        //
+        //
+        // -----------------------UPLOAD IMAGE START ---------------------------------//
+        //edw ftiaxnw to path - OPOS sto kotlin - Upload to Firebase Storage
+        // Ftiaxnw to reference kai to bazw sth metablith storageRef
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('user_images')
+            .child('profile_photo')
+            .child('${userCredentials.user!.uid}.jpeg');
+
+        // wait this uppload to finish (await)
+        await storageRef.putFile(_selectedImage!);
+        // I want the URL which can help me later to display image that was stored on Firebase
+        final imageUrl = await storageRef.getDownloadURL();
+        print(imageUrl); // to ektipwnw sth consola
+
+        // -----------------------UPLOAD IMAGE END ----------------------------------//
       }
     }
     //---------- GIA ISSUE ERROR me to AUTHENTICATION START ------------//
@@ -137,6 +181,16 @@ class _AuthScreenState extends State<AuthScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // only if we are SignIN (during creation new account ONLY)
+                          // to epitigxanw me. th xrish "!"
+                          if (!_isLogin)
+                            // ean einai se epomeno login tote den emfanizetai
+                            UserImagePicker(
+                              onPickImage: (pickedImage) {
+                                // thats how we hold the image in the form here
+                                _selectedImage = pickedImage;
+                              },
+                            ),
                           TextFormField(
                             decoration:
                                 InputDecoration(labelText: 'Email Address'),
