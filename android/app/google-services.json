@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "612333448315",
+    "project_id": "chatify-udemy-aae94",
+    "storage_bucket": "chatify-udemy-aae94.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612333448315:android:4163120ce26d11946286de",
+        "android_client_info": {
+          "package_name": "com.example.chat_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-qPYjvSxExt_kLsGmcGTquAawZjMeBzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
