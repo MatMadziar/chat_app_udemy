@@ -35,7 +35,8 @@ class _AuthScreenState extends State<AuthScreen> {
   var _enteredPassword = '';
   // Add Photo, file not null
   File? _selectedImage;
-  //
+  // isUpploading is false gt den fortonei kati mexri na patisw to sign in
+  var _isAuthenticating = false;
   //
   // I want to make sure that the values are safe and I get hold the entered values
   // For this reason I create a key which will be connected to Form State.
@@ -76,7 +77,15 @@ class _AuthScreenState extends State<AuthScreen> {
     // gia arxh den exw users opote doulebw me to else block
 
     try {
+      // oso tsekarw an ola einai ok borw na rithmisw na fainetai kai kapoio loading spinner
+      // oso kanw uppload to image h ta dedomena genika sto firebase
       // bazw olo se try catch block
+      setState(() {
+        // to bazw na piasei kai to login kai to sign in gt kai sto sign in stelnw dedomena sto firebase
+        // kai borei na uparxei kathisterish kai ekei
+        _isAuthenticating = true;
+      });
+
       if (_isLogin) {
         //----SOS----//
         //
@@ -112,6 +121,7 @@ class _AuthScreenState extends State<AuthScreen> {
             .child('user_images')
             .child('profile_photo')
             .child('${userCredentials.user!.uid}.jpeg');
+        // borw kai email// "!" gia na mhn einai keno
 
         // wait this uppload to finish (await)
         await storageRef.putFile(_selectedImage!);
@@ -138,9 +148,17 @@ class _AuthScreenState extends State<AuthScreen> {
       }
       // gia emfanish tou error kata to authentication. analoga me ton typo tou error
       ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(error.message ?? 'Authentication failed.'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message ?? 'Authentication failed.'),
+        ),
+      );
+      // to bazw gia na epistepsw sthn arxikh katastash.
+      // aliws o user den tha exei thn dinatothta na ksanadei ta koubia gia na kanei
+      // ti diadikasia tou authentication
+      setState(() {
+        _isAuthenticating = false;
+      });
     }
     //---------- GIA ISSUE ERROR me to AUTHENTICATION END ------------//
 
@@ -241,18 +259,24 @@ class _AuthScreenState extends State<AuthScreen> {
                             },
                           ),
                           SizedBox(height: 12),
-                          ElevatedButton(
-                            onPressed: _submit,
-                            // I will be back later
+                          // if IS authanticating, show me the progress indicator
+                          if (_isAuthenticating)
+                            const CircularProgressIndicator(),
+                          // if NOT authenticated show me the button
+                          if (!_isAuthenticating)
+                            ElevatedButton(
+                              onPressed: _submit,
+                              // I will be back later
 
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primaryContainer,
+                              ),
+                              // to kanwm gia na allazete to text an o xrhsths pathsei oti exei logariasmo ekei
+                              child: Text(_isLogin ? 'Login' : 'SignUp'),
                             ),
-                            // to kanwm gia na allazete to text an o xrhsths pathsei oti exei logariasmo ekei
-                            child: Text(_isLogin ? 'Login' : 'SignUp'),
-                          ),
+                          // if NOT authenticated show me the textButton
                           TextButton(
                             onPressed: () {
                               setState(() {
