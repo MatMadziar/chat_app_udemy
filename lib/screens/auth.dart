@@ -14,6 +14,8 @@ final _firebase = FirebaseAuth.instance;
 // its stateful Widget because i will make a form and i will collect the users data
 // we will use some features that requires statefull widget
 class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
+
 // createstate
   @override
   State<StatefulWidget> createState() {
@@ -65,14 +67,15 @@ class _AuthScreenState extends State<AuthScreen> {
         // ta bazw kai se ena try catch gia na apofigw ta errors
         final userCredentials = await _firebase.signInWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
-        print(userCredentials); // emfanizw ta user credential sto debug console
+        // print(userCredentials); // emfanizw ta user credential sto debug console
       } else {
         // try the code in bracelets, catch an exeption
         // this could fail so I need to wrap this in try and catch block
         // I create an user with email and password and I assign it to the value userCredentials
+        // bazw to await gia na parw ta stoixeia apo to firebase
         final userCredentials = await _firebase.createUserWithEmailAndPassword(
             email: _enteredEmail, password: _enteredPassword);
-        print(userCredentials); // emfanizw ta user credential sto debug console
+        // print(userCredentials); // emfanizw ta user credential sto debug console
       }
     }
     //---------- GIA ISSUE ERROR me to AUTHENTICATION START ------------//
