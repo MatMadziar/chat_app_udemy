@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+//
+// Se auto to file:
+// Rithmizw to ginete me ta minimata ths sinomilias olhs
+//
+
 class ChatMessage extends StatelessWidget {
   const ChatMessage({super.key});
 

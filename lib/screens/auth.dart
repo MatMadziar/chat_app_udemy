@@ -144,7 +144,7 @@ class _AuthScreenState extends State<AuthScreen> {
             .set({
           'username': _entredUserName,
           'email': _enteredEmail,
-          'image_URL': imageUrl,
+          'image_url': imageUrl,
           'user_UID': userCredentials.user!.uid,
         });
       }

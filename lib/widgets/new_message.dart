@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 //
@@ -16,7 +18,7 @@ class NewMessage extends StatefulWidget {
 }
 
 class _NewMessageState extends State<NewMessage> {
-  var _messageController = TextEditingController();
+  final _messageController = TextEditingController();
 
   // I need to add this for controller user input
   @override
@@ -30,7 +32,7 @@ class _NewMessageState extends State<NewMessage> {
 // I need this function to send user message to firebase
 // void doesn not return any value
 // edw rithmizw ti kai pws tha stalthei sth bash mou. mesa sae auth th sinarthsh
-  void _submitMessage() {
+  void _submitMessage() async {
     // bazw thn eisodo tou xrhsth se metablith kai thn kanw text
     final entredMessage = _messageController.text;
 
@@ -39,12 +41,38 @@ class _NewMessageState extends State<NewMessage> {
       return;
     }
 
-    //-------------- send to firebase START --------------
-
-    //-------------- send to firebase END --------------
-
+    // gia na katebasw to keyboard
+    // put ut here because I don't want to keep the keyboard open when I send the data to Firestore
+    FocusScope.of(context).unfocus();
     // afou stalthei to minima katharizw to pedio tou text na mhn exei to proigoumeno mhnima
     _messageController.clear();
+    //
+
+    //-------------- send messages to firebase START --------------
+
+    // I use also the authentication here for the credential of Current logged IN USER (should not be null)
+    // den tha einai pote null gt gia na bei kapoios sto chat activity exei perasei to authentication outos h allios
+    final user = FirebaseAuth.instance.currentUser!;
+    //
+    // me to apo katw fernw ta stoixia apo th bash dedomenon gia na wta steilw meta sth basi mazi me ta messages
+    // me to get fernw ta stoixia apo to path pou dialeksa
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+    //
+    // I dont make my own name but I will assign to the doc (add())
+    // unique id (automated generated) provided by firebase
+    FirebaseFirestore.instance.collection('chat').add({
+      'text': entredMessage,
+      'createdAt': Timestamp.now(),
+      'userId': user.uid,
+      // to use the user name and image We need to retrieve them from firestore
+      'userName': userData.data()!['username'],
+      'userImage': userData.data()!['image_url'],
+    });
+
+    //-------------- send messages to firebase END --------------
   }
 
   //-------------  END to save and store in FIREBASE ----------------
