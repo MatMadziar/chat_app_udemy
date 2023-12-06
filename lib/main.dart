@@ -36,7 +36,7 @@ class App extends StatelessWidget {
       ),
       // an den exw to token tpu authantication tote tou bgazw to AuthScreen
       // Alliws otan o user exei kanei authentication kai den exei kanei logout,
-      // tote ton metaferw sth kanoniki selida san na exei perasei to login klp
+      // tote ton metaferw sth kanoniki s elida san na exei perasei to login klp
       //home: AuthScreen());
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
