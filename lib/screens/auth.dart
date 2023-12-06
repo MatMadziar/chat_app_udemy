@@ -1,4 +1,6 @@
 import 'package:chat_app/widgets/user_image_picker.dart';
+// I need this in order to use the firebase cloud firestore database
+import 'package:cloud_firestore/cloud_firestore.dart';
 // I need this in order to use Firebase Storage package
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +33,11 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   var _isLogin = true;
   // I will add 2 empty string values
+  // the "_" before the varialbes names meants that they are private. can be used only inthis dart file
   var _enteredEmail = '';
   var _enteredPassword = '';
+  // variablie for userName
+  var _entredUserName = '';
   // Add Photo, file not null
   File? _selectedImage;
   // isUpploading is false gt den fortonei kati mexri na patisw to sign in
@@ -113,7 +118,7 @@ class _AuthScreenState extends State<AuthScreen> {
         // I want to uppload photo. First create account then add extra info
         //
         //
-        // -----------------------UPLOAD IMAGE START ---------------------------------//
+        // ----------------------- UPLOAD IMAGE START ---------------------------------//
         //edw ftiaxnw to path - OPOS sto kotlin - Upload to Firebase Storage
         // Ftiaxnw to reference kai to bazw sth metablith storageRef
         final storageRef = FirebaseStorage.instance
@@ -129,7 +134,19 @@ class _AuthScreenState extends State<AuthScreen> {
         final imageUrl = await storageRef.getDownloadURL();
         print(imageUrl); // to ektipwnw sth consola
 
-        // -----------------------UPLOAD IMAGE END ----------------------------------//
+        // ----------------------- UPLOAD IMAGE END ----------------------------------//
+        // Sindesh me to FireßstoreDatabase
+        // FirebaseFirestore.instance.collection('users').doc(''); // with fixed document name
+        // dynamic name tou document: (na allazei me bazei to user UID credentials automata)
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredentials.user!.uid)
+            .set({
+          'username': _entredUserName,
+          'email': _enteredEmail,
+          'image_URL': imageUrl,
+          'user_UID': userCredentials.user!.uid,
+        });
       }
     }
     //---------- GIA ISSUE ERROR me to AUTHENTICATION START ------------//
@@ -237,8 +254,31 @@ class _AuthScreenState extends State<AuthScreen> {
                               // den xrisimopoiw to set state gia na mhn exw update sto UI
                             },
                           ),
+                          // this should be show ONLY when we are in SIGN IN MODE
+                          // NOT when we are Login in (epanasindesh)
+                          if (!_isLogin)
+                            TextFormField(
+                              decoration:
+                                  const InputDecoration(labelText: 'Username'),
+                              enableSuggestions: false,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    value.length < 4) {
+                                  return 'Please enter a valid username (at least 4 characters)';
+                                }
+                                // Othervise return null
+                                // dld an ola OK tote mhn epistrepeis kapoio minima error
+                                return null;
+                              },
+                              // we need this onSaved mode
+                              onSaved: (value) {
+                                _entredUserName = value!;
+                              },
+                            ),
                           TextFormField(
-                            decoration: InputDecoration(labelText: 'Password'),
+                            decoration:
+                                const InputDecoration(labelText: 'Password'),
                             // edw orizw ton typo eisodou dedomenon pou tha balei o xrhsths
                             // edw px na einai password type
                             // na mhn fenonde auto pou grafei o xrhsths

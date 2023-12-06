@@ -39,6 +39,8 @@ dependencies:
   firebase_auth: ^4.15.0
   firebase_storage: ^11.5.3
   image_picker: ^1.0.4
+  # gia na xrisimopoihsw to package tou Firebase gia to Cloud Database
+  cloud_firestore: ^4.13.3
 
 dev_dependencies:
   flutter_test:
